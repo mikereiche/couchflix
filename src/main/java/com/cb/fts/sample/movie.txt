@@ -1,0 +1,31 @@
+INSERT INTO `movies` ( KEY, VALUE ) VALUES ( "81899", {
+  "adult": false,
+  "type": "movie",
+  "budget": 0,
+  "genres": [{
+    "id": 99,
+    "name": "Documentary"
+  }],
+  "homepage": "http://treknationmovie.com/",
+  "id": 81899,
+  "imdbId": "tt1529666",
+  "original_language": "en",
+  "original_title": "Trek Nation",
+  "overview": "Trek Nation is a documentary film directed by Scott Colthorp examining the positive impact that Star Trek and creator Gene Roddenberry may have had on people's lives as seen through the eyes of his son, Eugene Roddenberry, Jr. ('Rod'). It includes interviews with castmembers and crew from all five Star Trek shows, as well as various fans and celebrities who were markedly influenced by the show while growing up. Rod Roddenberry also visits Skywalker Ranch to interview George Lucas on the influence that Star Trek had on him. Lucas shares how he had gone to Star Trek conventions prior to creating Star Wars.",
+  "popularity": 2.242117,
+  "release_date": "2011-11-30T00:00:00Z",
+  "revenue": 0,
+  "runtime": 88,
+  "spoken_languages": [{
+    "iso_639_1": "en",
+    "name": "English"
+  }],
+  "status": "Released",
+  "tagline": "",
+  "title": "Trek Nation",
+  "video": false,
+  "vote_average": 7.0,
+  "vote_count": 13,
+  "_class": "com.cb.fts.sample.entities.Movie"
+}
+);

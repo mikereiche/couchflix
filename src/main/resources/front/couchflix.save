@@ -1,0 +1,516 @@
+
+<script src="jquery-2.2.4.min.js" ></script>
+<script src="popper.min.js" ></script>
+<script src="bootstrap.min.js" ></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+
+<script src="mustache.min.js"></script>
+<link href="carousel.css" rel="stylesheet">
+<script type="text/javascript" src="jquery.json-editor.min.js"></script>
+<link href="fontawesome/css/all.min.css" rel="stylesheet" >
+
+<link href="select2.min.css" rel="stylesheet" />
+<link href="select2-bootstrap.min.css" rel="stylesheet" />
+<script src="select2.min.js"></script>
+
+<style>
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.s006 {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.s006 form {
+  width: 100%;
+  max-width: 790px;
+}
+
+
+.s006 form .inner-form {
+  width: 100%;
+  margin-bottom: 17px;
+}
+
+.s006 form .inner-form .input-field {
+  height: 70px;
+  width: 100%;
+  position: relative;
+}
+
+.s006 form .inner-form .input-field input {
+  height: 80%;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  background: #fff;
+  display: block;
+  width: 100%;
+  padding: 10px 32px 10px 70px;
+  font-size: 18px;
+  color: #666;
+  border-radius: 34px;
+}
+
+.s006 form .inner-form .input-field input.placeholder {
+  color: #ccc;
+  font-size: 18px;
+}
+
+.s006 form .inner-form .input-field input:-moz-placeholder {
+  color: #ccc;
+  font-size: 18px;
+}
+
+.s006 form .inner-form .input-field input::-webkit-input-placeholder {
+  color: #ccc;
+  font-size: 18px;
+}
+
+.s006 form .inner-form .input-field input:hover, .s006 form .inner-form .input-field input:focus {
+  box-shadow: none;
+  outline: 0;
+}
+
+.s006 form .inner-form .input-field .btn-search {
+  width: 70px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  position: absolute;
+  left: 0;
+  height: 80%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  -ms-flex-pack: center;
+      justify-content: center;
+  align-items: center;
+}
+
+.s006 form .inner-form .input-field .btn-search svg {
+  fill: #ccc;
+  width: 30px;
+  height: 30px;
+  transition: all .2s ease-out, color .2s ease-out;
+}
+
+.s006 form .inner-form .input-field .btn-search:hover, .s006 form .inner-form .input-field .btn-search:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+.s006 form .inner-form .input-field .btn-search:hover svg, .s006 form .inner-form .input-field .btn-search:focus svg {
+  fill: #666;
+}
+
+.s006 form .suggestion-wrap {
+  padding: 0 15px;
+}
+
+
+@media screen and (max-width: 767px) {
+  .s006 form .inner-form .input-field {
+    margin-bottom: 20px;
+    height: 50px;
+  }
+  .s006 form .inner-form .input-field input {
+    padding-left: 55px;
+    font-size: 16px;
+  }
+  .s006 form .inner-form .input-field .btn-search svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.imgLoading {
+  background:  url('loadingtv.gif') center no-repeat;
+}
+
+#json-display {
+    border: 1px solid #000;
+    margin: 0;
+    padding: 10px 20px;
+}
+
+.view_more {
+    color: #fff;
+    font-weight: bolder;
+    font-size: x-large;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+#noResults {
+  color: rgb(255, 255, 255);
+  margin: 50px;
+  font-size: -webkit-xxx-large;
+  display:none;
+}
+
+#filterSpan:after {
+    content:"";
+    flex: 1 1 auto;
+    border-top: 1px solid #fff;
+}
+
+</style>
+
+<body style="background: #000">
+  <div class="container-fluid">
+  <img src="couchflix.png"/>
+  <br>
+
+  <div class="s006">
+    <form onsubmit="event.preventDefault();searchMovies(true)">
+        <div class="inner-form">
+          <div class="input-field">
+            <button class="btn-search" type="button" onclick="javascript:search()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+              </svg>
+            </button>
+            <input id="search" type="text" placeholder="" value="" autocomplete="off"/>
+          </div>
+        </div>
+    </form>
+  </div>
+  <div id="facetsFiltersTitle" style="display:none">
+    <div> <a href="javascript:toggleFilters()" style="color:#d6d4d4"> <i class="fa fa-plus" id="filterSpanSymbol"></i>  <span id="filterSpan" widht="100%"><strong>Filters</strong</span></a></div>
+    <div id="facetsFilters" style="display:none" >
+      <fieldset style="border-radius: 8px;border: 1px solid #d6d4d4;margin-top: 10px;">
+        <div class="row" style="margin:10px; width:100%">
+          <div class="col-md-4" id="genresTagsFilter" style="display:none">
+            <div class="form-group">
+                <label class="filter-col" style="margin-right:0;color:#fff" for="genresTags" style="color:#fff">Genres:</label>
+                <select id="genresTags" onchange="javascript:searchMovies(false);" class="form-control"  multiple >
+                </select>
+            </div>
+          </div>
+          <div class="col-md-4" id="yearFacetFilter" style="display:none">
+            <div class="form-group">
+                <label class="filter-col" style="margin-right:0;color:#fff" for="yearFacet" style="color:#fff">Released Year:</label>
+                <select id="yearFacet" onchange="javascript:searchMovies(false);" class="form-control"  multiple >
+                </select>
+            </div>
+          </div>
+          <!-- <div class="col-md-4" id="yearFacetFilter" style="display:none">
+            <div class="form-group">
+                <label class="filter-col" style="margin-right:0;color:#fff" for="yearFacet" style="color:#fff">Released Year:</label>
+                <select id="yearFacet" onchange="javascript:searchMovies(false);" class="form-control"  multiple >
+                </select>
+            </div>
+          </div> -->
+          <!-- <div class="col-md-4" id="collectionFacetFilter" style="display:none">
+            <div class="form-group">
+                <label class="filter-col" style="margin-right:0;color:#fff" for="collectionFacet" style="color:#fff">Collection:</label>
+                <select id="collectionFacet" onchange="javascript:searchMovies(false);" class="form-control"  multiple >
+                </select>
+            </div>
+          </div> -->
+        </div>
+    </fieldset>
+    </div>
+  </div>
+  <h1 id="noResults" >No results found</h1>
+  <div id="movieCard" style="display:none"></div>
+  <div class="row">
+      <div class="col-md-12">
+        <div class="carousel invisible-scrollbar" style="height:450px">
+            <div id="carousel-row" class="carousel-row ">
+            </div>
+        </div>
+      </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-12">
+      <a href="#" id="viewDetailsLink" style="display:none" class="show_hide view_more" data-content="toggle-text">+ View Details</a>
+      <div class="content" style="display:none">
+        <pre id="json-display"></pre>
+      </div>
+    </div>
+ </div>
+</div>
+
+  <script type="application/javascript">
+
+    $.fn.select2.defaults.set( "theme", "bootstrap" );
+
+    var movies = {};
+    var editor = null;
+
+    function loadDetails(movieId) {
+
+      var that = this;
+      var moviesTemplate = $("#movieDetailTemplate").html();
+      console.log(that.movies[movieId]);
+      var movies = Mustache.to_html(moviesTemplate, that.movies[movieId]);
+      //.hide().html("You clicked on a checkbox.").fadeIn('slow');
+
+
+      if($("#movieCard").css("display") == "none"){
+        $("#movieCard").html(movies);
+        $("#movieCard").slideToggle();
+      } else {
+        $("#movieCard").hide().html(movies).fadeIn('slow');
+      }
+
+      $.get( "http://localhost:8080/api/movie/getCover?movieName="+that.movies[movieId].title, function( data ) {
+            console.log(data.url);
+            $("#movieCover").html("");
+            $("#movieCover").css({
+                "background": "linear-gradient(to left, transparent 50%, black 100%),linear-gradient(to top, transparent 50%, black 100%), url('"+data.url+"')",
+                "background-size": "cover"
+            });
+      });
+
+    }
+
+
+    function searchMovies(updateFilters) {
+
+      if($("#movieCard").css("display") == "block"){
+        $("#movieCard").slideToggle();
+      }
+
+      if(updateFilters) {
+        $("#facetsFiltersTitle").hide();
+        $("#facetsFilters").hide();
+        $("#filterSpanSymbol").attr('class', 'fa fa-plus');
+
+        $("#genresTagsFilter").hide();
+        $("#collectionFacetFilter").hide();
+        $("#yearFacetFilter").hide();
+      }
+
+      var query = $("#search").val();
+      var results = []
+      movies = {}
+      var that = this;
+      var filters = "genres="+($("#genresTags").val()== null?"":$("#genresTags").val().join(","));
+      filters += "::collection="+($("#collectionFacet").val()== null?"":$("#collectionFacet").val().join(","));
+      filters += "::year="+($("#yearFacet").val()== null?"":$("#yearFacet").val().join(","));
+
+      $.get( "http://localhost:8080/api/movie/search?query="+query+"&filters="+filters, function( data ) {
+
+          var facets = data.facets;
+
+          data = data.results;
+          if(data.length > 0) {
+
+              //filter adult movies
+              data = data.filter(item => !item.movie.adult)
+
+              data.forEach(function(entry) {
+                  results.push(entry.stats);
+                  entry.movie.stars = calculateStars(entry.movie.voteAverage);
+                  entry.movie.overview = addEllipsis(entry.movie.overview);
+                  that.movies[entry.movie.id] = entry.movie;
+
+                  if(entry.movie.releaseDate) {
+                    entry.movie.releaseDate = entry.movie.releaseDate.substr(0,4)
+                  }
+              })
+
+              $("#viewDetailsLink").show();
+              $("#noResults").hide();
+              editor = new JsonEditor('#json-display', results);
+          } else {
+              editor = new JsonEditor('#json-display', []);
+              $("#viewDetailsLink").hide();
+              $("#noResults").show();
+          }
+
+          if(updateFilters && facets != null && facets.length > 0) {
+
+            $("#facetsFiltersTitle").show();
+
+            for (i = 0; i < facets.length; i++) {
+              var facet = facets[i];
+
+              if(facet.name == "genres") {
+                $("#genresTagsFilter").show();
+                var genresTemplate = $("#tagsTemplate").html();
+                var genresHtml = Mustache.to_html(genresTemplate, {
+                    "items": facet.items
+                });
+                $("#genresTags").html(genresHtml);
+                $('#genresTags').select2({width: 'style'});
+
+              } else if(facet.name == "collection") {
+                $("#collectionFacetFilter").show();
+                var genresTemplate = $("#tagsTemplate").html();
+                var genresHtml = Mustache.to_html(genresTemplate, {
+                    "items": facet.items
+                });
+                $("#collectionFacet").html(genresHtml);
+                $('#collectionFacet').select2({width: 'style'});
+
+              } else if(facet.name == "year") {
+                $("#yearFacetFilter").show();
+                var genresTemplate = $("#tagsTemplate").html();
+                var genresHtml = Mustache.to_html(genresTemplate, {
+                    "items": facet.items
+                });
+                $("#yearFacet").html(genresHtml);
+                $('#yearFacet').select2({width: 'style'});
+              }
+            }
+          }
+
+
+
+          var moviesTemplate = $("#moviesTemplate").html();
+          var movies = Mustache.to_html(moviesTemplate, {
+              "content": data
+          });
+          $("#carousel-row").html(movies);
+      });
+
+      return false;
+    }
+
+    function toggleFilters() {
+
+        if( $("#facetsFilters").css("display") == "block" ) {
+          $("#facetsFilters").slideToggle(100);
+          $("#filterSpanSymbol").removeClass();
+
+          $("#filterSpanSymbol").attr('class', 'fa fa-plus');
+        } else {
+          $("#facetsFilters").slideToggle(100);
+          $("#filterSpanSymbol").removeClass();
+          $("#filterSpanSymbol").attr('class', 'fa fa-minus');
+        }
+    }
+
+    function addEllipsis (text) {
+
+        if(text.length > 350) {
+          text = text.substr(0,347);
+          text = text.substr(0, text.lastIndexOf(" "))+" ...";
+        }
+        return text;
+    }
+
+    $(document).ready(function () {
+        $(".content").hide();
+        $(".show_hide").on("click", function () {
+            var txt = $(".content").is(':visible') ? '+ View Details' : '- Hide Details';
+            $(".show_hide").text(txt);
+            $(this).next('.content').slideToggle(200);
+        });
+    });
+
+
+    var lastSelected = null;
+    function highlightBlock(id) {
+
+      loadDetails(id);
+      var previousSelect = $(".block-selected");
+      previousSelect.removeClass("block-selected")
+      previousSelect.css("background-color","");
+
+      if(lastSelected) {
+        $("#"+lastSelected.replace('::','\\:\\:')+"-poster").css({
+          "border": "",
+          "border-radius": "",
+        })
+      }
+
+      $("#"+id.replace('::','\\:\\:')+"-poster").css({
+        "border": "5px solid #fff",
+        "border-radius": "10px",
+      })
+
+      lastSelected = id;
+
+      var target = $("#json-display").find( "span:contains(\""+id+"\")" )
+            .parent().parent()
+      target.css( "background-color", "#070d1b" );
+      target.addClass( "block-selected" );
+    }
+
+    function calculateStars(rating){
+
+      var rating = rating/2;
+
+      var stars = [];
+      for (i = 0; i < 5; i++) {
+          if(rating>= 1) {
+            stars.push({"starClass":"fas fa-star"})
+            rating--;
+          } else if(rating >= 0.5) {
+            stars.push({"starClass":"fas fa-star-half-alt"})
+            rating--;
+          } else {
+            stars.push({"starClass":"far fa-star"})
+          }
+      }
+
+      return stars;
+    }
+  </script>
+
+
+  <script id="moviesTemplate" type="text/template">
+      {{#content}}
+      <div class="carousel-tile" class="imgLoading"><img height="375" widht="250"
+          id="{{movie.id}}-poster"
+          onclick="javascript:highlightBlock('{{movie.id}}')"
+          onerror="$('#{{movie.id}}-poster'.replace('::','\\:\\:')).attr('src', 'devfix-img-error.jpg');"
+         src="https://image.tmdb.org/t/p/w500{{movie.posterPath}}">
+       </div>
+      {{/content}}
+  </script>
+
+
+  <script id="movieDetailTemplate" type="text/template">
+     <div class="row" style="margin-left:30px">
+        <div class="col-md-6" style="max-height: 500px">
+          <div class="jumbotron" style="color:#fff;background-color:#000">
+            <h1 class="display-5">{{title}}</h1>
+            <p><strong>{{releaseDate}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;
+              <span style="color:#f56b6b">
+                {{#stars}}
+                  <i class="{{starClass}}"></i>
+                {{/stars}}
+              </span>
+            </p>
+            <p class="lead" style="color:#bdbdbd">{{overview}}</p>
+            <p class="lead">
+              <a class="btn btn-light btn-lg" style="margin-right:10px" href="#" role="button"><i class="fas fa-play"></i>  Watch</a>
+              <a class="btn btn-secondary btn-lg" href="#" role="button"><i class="fas fa-plus"></i> My List</a>
+            </p>
+            <p style="color:#5d5d5d">It uses utility classes for typography and spacing to space content out within the larger container.</p>
+          </div>
+        </div>
+        <div class="col-md-6" id="movieCover"  >
+          <div style="color:#aaa; text-align: center;margin-top: 150px">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+          </div>
+        </div>
+      </div>
+  </script>
+
+
+  <script id="tagsTemplate" type="text/template">
+      {{#items}}
+      <option value="{{name}}">{{name}} ({{total}})</option>
+      {{/items}}
+  </script>
+
+</body>

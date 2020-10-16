@@ -1,0 +1,264 @@
+private Result search2(String word){
+        String indexName = "movies_all_index";
+        DisjunctionQuery title = getDisjunction(word, "title");
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, title).highlight().limit(30));
+        return  getSearchResults(result);
+    }
+
+    private Result search3(String word){
+        String indexName = "movies_all_index";
+        DisjunctionQuery title = getDisjunction(word, "title");
+        DisjunctionQuery overview = getDisjunction(word, "overview");
+        DisjunctionQuery originalTitle = getDisjunction(word, "originalTitle");
+
+        DisjunctionQuery fts = SearchQuery.disjuncts(title, overview, originalTitle);
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, fts).highlight().limit(30));
+        return  getSearchResults(result);
+    }
+
+    private Result search4(String word){
+        String indexName = "movies_shingle";
+        DisjunctionQuery title = getDisjunction(word, "title");
+        DisjunctionQuery overview = getDisjunction(word, "overview");
+       DisjunctionQuery originalTitle = getDisjunction(word, "originalTitle");
+
+        DisjunctionQuery fts = SearchQuery.disjuncts(title, overview, originalTitle);
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, fts).highlight().limit(30));
+        return  getSearchResults(result);
+    }
+
+
+    private Result search5(String word){
+        String indexName = "movies_shingle";
+        DisjunctionQuery title = getDisjunction(word, "title", 1.4);
+        DisjunctionQuery overview = getDisjunction(word, "overview");
+        DisjunctionQuery originalTitle = getDisjunction(word, "originalTitle", 1.15);
+
+        DisjunctionQuery fts = SearchQuery.disjuncts(title, overview, originalTitle);
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(
+            fts, boostReleaseYearQuery()
+        );
+
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, conjunctionQuery).highlight().explain(true).limit(30));
+        return  getSearchResults(result);
+    }
+
+
+    private Result search6(String words){
+        String indexName = "movies_shingle";
+        DisjunctionQuery titleQuery = getDisjunction(words, "title", 1.4);
+        DisjunctionQuery originalQuery = getDisjunction(words, "originalTitle", 1.15);
+        DisjunctionQuery overviewQuery = getDisjunction(words, "overview");
+        DisjunctionQuery ftsQuery = SearchQuery.disjuncts(titleQuery, originalQuery, overviewQuery);
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostReleaseYearQuery(), boostPopularity(), boostRuntime());
+
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, conjunctionQuery).highlight().highlight().limit(30));
+
+        return getSearchResults(result);
+    }
+
+
+
+
+    private Result search7(String words){
+        String indexName = "movies_shingle";
+        DisjunctionQuery titleQuery = getDisjunction(words, "title", 1.4);
+        DisjunctionQuery originalQuery = getDisjunction(words, "originalTitle", 1.15);
+        DisjunctionQuery overviewQuery = getDisjunction(words, "overview");
+        DisjunctionQuery collectionName = getDisjunction(words, "collection.name", 1.1);
+
+        DisjunctionQuery ftsQuery = SearchQuery.disjuncts(titleQuery, originalQuery, overviewQuery, collectionName);
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostPopularity(),
+                boostRuntime(),
+                boostWeightedRating(),
+                boostReleaseYearQuery());
+
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, conjunctionQuery).highlight().limit(30));
+
+        return getSearchResults(result);
+    }
+
+
+    private Result search8(String words){
+        String indexName = "movies_shingle";
+        DisjunctionQuery titleQuery = getDisjunction(words, "title", 1.4);
+        DisjunctionQuery originalQuery = getDisjunction(words, "originalTitle", 1.15);
+        DisjunctionQuery overviewQuery = getDisjunction(words, "overview");
+        DisjunctionQuery collectionName = getDisjunction(words, "collection.name", 1.1);
+
+        DisjunctionQuery ftsQuery = SearchQuery.disjuncts(titleQuery, originalQuery, overviewQuery, collectionName);
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostPopularity(),
+                boostRuntime(),
+                boostWeightedRating(),
+                boostPromoted(),
+                boostReleaseYearQuery());
+
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, conjunctionQuery).highlight().limit(30));
+
+        return getSearchResults(result);
+    }
+
+    private Result search9(String words, Map<String, List<String>> facets){
+        String indexName = "movies_shingle";
+        DisjunctionQuery titleQuery = getDisjunction(words, "title", 1.4);
+        DisjunctionQuery originalQuery = getDisjunction(words, "originalTitle", 1.15);
+        DisjunctionQuery overviewQuery = getDisjunction(words, "overview");
+        DisjunctionQuery collectionName = getDisjunction(words, "collection.name", 1.1);
+
+        DisjunctionQuery ftsQuery = SearchQuery.disjuncts(titleQuery,
+                originalQuery,
+                overviewQuery,
+                collectionName
+        );
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostPopularity(),
+                boostRuntime(),
+                boostWeightedRating(),
+                boostPromoted(),
+                boostReleaseYearQuery());
+
+        if(!facets.isEmpty()) {
+            conjunctionQuery = addFacetFilters(conjunctionQuery, facets);
+        }
+
+        SearchQuery searchQuery = new SearchQuery(indexName, conjunctionQuery).highlight().limit(30);
+        searchQuery.addFacet("genres",  SearchFacet.term("genres.name", 10));
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(searchQuery);
+
+        return getSearchResults(result);
+    }
+
+
+    private Result search10(String words, Map<String, List<String>> facets){
+        String indexName = "movies_shingle";
+        DisjunctionQuery titleQuery = getDisjunction(words, "title", 1.4);
+        DisjunctionQuery originalQuery = getDisjunction(words, "originalTitle", 1.15);
+        DisjunctionQuery overviewQuery = getDisjunction(words, "overview");
+        DisjunctionQuery collectionName = getDisjunction(words, "collection.name", 1.1);
+
+        DisjunctionQuery ftsQuery = SearchQuery.disjuncts(titleQuery,
+                originalQuery,
+                overviewQuery,
+                collectionName,
+                getActorsDisjunction(words)
+        );
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostPopularity(),
+                boostRuntime(),
+                boostWeightedRating(),
+                boostPromoted(),
+                boostReleaseYearQuery());
+
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(
+                new SearchQuery(indexName, conjunctionQuery).highlight().limit(30));
+
+        return getSearchResults(result);
+    }
+
+
+
+
+    private Result search11(String words, Map<String, List<String>> facets){
+        String indexName = "movies_shingle";
+
+        EntityExtractor entityExtractor = movieQueryParser.parse(words);
+
+        DisjunctionQuery ftsQuery = new DisjunctionQuery();
+        if(entityExtractor.getWords().trim().length() >0) {
+            ftsQuery.or(getDisjunction(entityExtractor.getWords(), "title", 1.4));
+            ftsQuery.or( getDisjunction(entityExtractor.getWords(), "originalTitle", 1.15));
+            ftsQuery.or(getDisjunction(entityExtractor.getWords(), "collection.name", 1.1));
+            ftsQuery.or( getDisjunction(entityExtractor.getWords(), "overview"));
+        }
+
+        DisjunctionQuery actors = getActorsDisjunction(words, entityExtractor);
+        if(actors!= null) {
+            ftsQuery.or(actors);
+        }
+
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostReleaseYearQuery(),
+                boostRuntime(),
+                boostPromoted(),
+                boostWeightedRating(),
+                boostPopularity());
+
+        if(entityExtractor.getEntities().containsKey(GENRES)) {
+            addFilters(conjunctionQuery, "genres.name", entityExtractor.getEntities().get(GENRES));
+        }
+
+        if(!facets.isEmpty()) {
+            conjunctionQuery = addFacetFilters(conjunctionQuery, facets);
+        }
+
+
+        System.out.println("===================================================");
+        System.out.println(entityExtractor);
+        System.out.println("===================================================");
+
+        SearchQuery searchQuery =  new SearchQuery(indexName, conjunctionQuery).highlight().limit(20);
+        searchQuery.addFacet("genres",  SearchFacet.term("genres.name", 10));
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(searchQuery);
+        return getSearchResults(result);
+    }
+
+
+    private Result search12(String words, Map<String, List<String>> facets){
+        String indexName = "movies_shingle";
+
+        EntityExtractor entityExtractor = movieQueryParser.parse(words);
+
+        DisjunctionQuery ftsQuery = new DisjunctionQuery();
+        if(entityExtractor.getWords().trim().length() >0) {
+            ftsQuery.or(getDisjunction(entityExtractor.getWords(), "title", 1.4));
+            ftsQuery.or( getDisjunction(entityExtractor.getWords(), "originalTitle", 1.15));
+            ftsQuery.or(getDisjunction(entityExtractor.getWords(), "collection.name", 1.1));
+            ftsQuery.or( getDisjunction(entityExtractor.getWords(), "overview"));
+        }
+
+        DisjunctionQuery actors = getActorsDisjunctionAdjusted(words, entityExtractor);
+        if(actors!= null) {
+            ftsQuery.or(actors);
+        }
+
+        ConjunctionQuery conjunctionQuery = SearchQuery.conjuncts(ftsQuery,
+                boostReleaseYearQuery(),
+                boostRuntime(),
+                boostPromoted(),
+                boostWeightedRating(),
+                boostPopularity());
+
+        if(entityExtractor.getEntities().containsKey(GENRES)) {
+            addFilters(conjunctionQuery, "genres.name", entityExtractor.getEntities().get(GENRES));
+        }
+
+        if(!facets.isEmpty()) {
+            conjunctionQuery = addFacetFilters(conjunctionQuery, facets);
+        }
+
+
+        System.out.println("===================================================");
+        System.out.println(entityExtractor);
+        System.out.println("===================================================");
+
+        SearchQuery searchQuery =  new SearchQuery(indexName, conjunctionQuery).highlight().limit(20);
+        searchQuery.addFacet("genres",  SearchFacet.term("genres.name", 10));
+        SearchQueryResult result = movieRepository.getCouchbaseOperations().getCouchbaseBucket().query(searchQuery);
+        return getSearchResults(result);
+    }

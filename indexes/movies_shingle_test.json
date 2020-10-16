@@ -1,0 +1,355 @@
+{
+  "name": "movies_shingle",
+  "type": "fulltext-index",
+  "params": {
+    "doc_config": {
+      "docid_prefix_delim": "",
+      "docid_regexp": "",
+      "mode": "type_field",
+      "type_field": "_class"
+    },
+    "mapping": {
+      "analysis": {
+        "analyzers": {
+          "names_analyzer": {
+            "token_filters": [
+              "to_lower",
+          "shingle_purel"
+            ],
+            "tokenizer": "unicode",
+            "type": "custom"
+          },
+          "overview_analyzer": {
+            "token_filters": [
+              "stop_en",
+              "to_lower",
+              "single_1_2"
+            ],
+            "tokenizer": "unicode",
+            "type": "custom"
+          },
+          "titles_analyzer": {
+            "token_filters": [
+              "to_lower",
+              "stop_en",
+              "shingle_simple"
+            ],
+            "tokenizer": "unicode",
+            "type": "custom"
+          }
+        },
+        "char_filters": {
+          "Remove colon": {
+            "regexp": ":",
+            "replace": "",
+            "type": "regexp"
+          }
+        },
+        "token_filters": {
+          "shingle_pure": {
+            "filler": "",
+            "max": 2,
+            "min": 2,
+            "output_original": false,
+            "separator": "",
+            "type": "shingle"
+          },
+          "shingle_simple": {
+            "filler": "",
+            "max": 2,
+            "min": 2,
+            "output_original": true,
+            "separator": "",
+            "type": "shingle"
+          },
+          "single_1_2": {
+            "filler": "",
+            "max": 2,
+            "min": 1,
+            "output_original": true,
+            "separator": "",
+            "type": "shingle"
+          }
+        }
+      },
+      "default_analyzer": "standard",
+      "default_datetime_parser": "dateTimeOptional",
+      "default_field": "_all",
+      "default_mapping": {
+        "dynamic": true,
+        "enabled": false
+      },
+      "default_type": "_default",
+      "docvalues_dynamic": true,
+      "index_dynamic": true,
+      "store_dynamic": false,
+      "type_field": "_type",
+      "types": {
+        "com.cb.fts.sample.entities.Movie": {
+          "dynamic": false,
+          "enabled": true,
+          "properties": {
+            "cast": {
+              "dynamic": false,
+              "enabled": true,
+              "properties": {
+                "character": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "overview_analyzer",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "character",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                },
+                "name": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "names_analyzer",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "name",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            },
+            "castAdjusted": {
+              "dynamic": true,
+              "enabled": true,
+              "properties": {
+                "name": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "names_analyzer",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "name",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            },
+            "collection": {
+              "dynamic": false,
+              "enabled": true,
+              "properties": {
+                "name": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "titles_analyzer",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "name",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            },
+            "crew": {
+              "dynamic": false,
+              "enabled": true,
+              "properties": {
+                "job": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "job",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                },
+                "name": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "analyzer": "names_analyzer",
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "name",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            },
+            "genres": {
+              "dynamic": false,
+              "enabled": true,
+              "properties": {
+                "name": {
+                  "enabled": true,
+                  "dynamic": false,
+                  "fields": [
+                    {
+                      "include_in_all": true,
+                      "include_term_vectors": true,
+                      "index": true,
+                      "name": "name",
+                      "store": true,
+                      "type": "text"
+                    }
+                  ]
+                }
+              }
+            },
+            "original_title": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "analyzer": "titles_analyzer",
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "original_title",
+                  "store": true,
+                  "type": "text"
+                }
+              ]
+            },
+            "overview": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "analyzer": "names_analyzer",
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "overview",
+                  "store": true,
+                  "type": "text"
+                }
+              ]
+            },
+            "popularity": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "popularity",
+                  "store": true,
+                  "type": "number"
+                }
+              ]
+            },
+            "promoted": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "promoted",
+                  "store": true,
+                  "type": "boolean"
+                }
+              ]
+            },
+            "release_year": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "release_year",
+                  "store": true,
+                  "type": "number"
+                }
+              ]
+            },
+            "runtime": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "runtime",
+                  "store": true,
+                  "type": "number"
+                }
+              ]
+            },
+            "title": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "analyzer": "titles_analyzer",
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "title",
+                  "store": true,
+                  "type": "text"
+                }
+              ]
+            },
+            "weightedRating": {
+              "enabled": true,
+              "dynamic": false,
+              "fields": [
+                {
+                  "include_in_all": true,
+                  "include_term_vectors": true,
+                  "index": true,
+                  "name": "weightedRating",
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "store": {
+      "indexType": "scorch",
+      "kvStoreName": ""
+    }
+  },
+  "sourceType": "couchbase",
+  "sourceName": "movies",
+  "sourceParams": {},
+  "planParams": {
+    "maxPartitionsPerPIndex": 171,
+    "numReplicas": 0
+  }
+}

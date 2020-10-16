@@ -1,0 +1,11 @@
+cb-movies-dataset3.json - final output to cb-import into couchbase with the command below
+cb-movies-actors.json - actors to cb-import
+
+cbimport json -c couchbase://127.0.0.1 -u Administrator -p password -b movies -d file://`pwd`/cb-moves-actors.json  -f list -g %id% -t 4 -v\n
+cbimport json -c couchbase://127.0.0.1 -u Administrator -p password -b movies -d file://`pwd`/cb-movies-dataset3.json  -f list -g %id% -t 4 -v\n
+
+# these scripts were used to prepare cb-movies-dataset3.json
+
+add_new_lines_1 - script to put each movie on a separate line in split.$$
+split_movies_into_files_2 - script to create a file for each movie
+update_poster_url_3 - script to update the poster url
